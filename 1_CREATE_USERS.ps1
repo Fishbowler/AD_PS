@@ -6,10 +6,13 @@ $USER_FIRST_LAST_LIST = Get-Content .\names.txt
 $password = ConvertTo-SecureString $PASSWORD_FOR_USERS -AsPlainText -Force
 New-ADOrganizationalUnit -Name _USERS -ProtectedFromAccidentalDeletion $false
 
+$counter = 0
+
 foreach ($n in $USER_FIRST_LAST_LIST) {
+    $counter++
     $first = $n.Split(" ")[0].ToLower()
     $last = $n.Split(" ")[1].ToLower()
-    $username = "$($first.Substring(0,1))$($last)".ToLower()
+    $username = "$($first.Substring(0,1))$($last)$($counter)".ToLower()
     Write-Host "Creating user: $($username)" -BackgroundColor Black -ForegroundColor Cyan
     
     New-AdUser -AccountPassword $password `
@@ -17,6 +20,7 @@ foreach ($n in $USER_FIRST_LAST_LIST) {
                -Surname $last `
                -DisplayName $username `
                -Name $username `
+               -SamAccountName $username `
                -EmployeeID $username `
                -PasswordNeverExpires $true `
                -Path "ou=_USERS,$(([ADSI]`"").distinguishedName)" `
